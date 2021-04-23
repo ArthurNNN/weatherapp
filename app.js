@@ -1,64 +1,32 @@
-// Go to this URL and register https://openweathermap.org/appid
-// Get your API KEY (appid)
-
 const API_KEY = '63727bfa5b324cce98dfb8d2c9fd3f38'
 const urlBase = 'https://api.weatherbit.io/v2.0/current?'
 
-const cities = [];
-cities.push({
-    name: "Barcelona",
-    latitude: 41.390205,
-    longitude: 2.154007,
-});
-cities.push({
-    name: "Madrid",
-    latitude: 40.41,
-    longitude: -3.70,
-});
-cities.push({
-    name: "Valencia",
-    latitude: 39.47,
-    longitude: -0.38
-});
+const cities = [
+    { name: "Barcelona", latitude: 41.390205, longitude: 2.154007 },
+    { name: "Moscow", latitude: 55.75583, longitude: 37.61778, },
+    { name: "New York", latitude: 40.72833, longitude: -73.99417 },
+    { name: "Beijing", latitude: 39.905, longitude: 116.39139 },
+    { name: "Istanbul", latitude: 41.01, longitude: 28.96028 },
+    { name: "Lagos", latitude: 6.45, longitude: 3.4 },
+    { name: "San Pablo", latitude: -23.5, longitude: -46.61667 },
+    { name: "Sydney", latitude: -33.86944, longitude: 151.20833 }];
 
-const render = (responseJson) => {
+const parseAndRender = (responseJson) => {
 
     let weatherObj = responseJson.data[0];
     console.log('Success: ');
     console.log(weatherObj);
 
-    let city = weatherObj.city_name;
+    let city = weatherObj.city_name + ', ' + weatherObj.country_code;
+    let notification = "";
     let temperature = weatherObj.temp + '°C';
     let iconUrl = 'https://www.weatherbit.io/static/img/icons/' + weatherObj.weather.icon + '.png';
     let description = weatherObj.weather.description;
-    let location = '[' + weatherObj.city_name + ', ' + weatherObj.country_code + ']';
-    let notification = "";
-    error = false;
-    renderCard(city, notification, temperature, iconUrl, description, location, error);
+
+    renderCard(city, notification, iconUrl, temperature, description);
 }
 
-const renderCard = (city, notification, temperature, iconUrl, description, location, error) => {
-
-//     <!-- <div class="card">
-//     <div class="city">
-//         <p>City</p>
-//     </div>
-//     <div class="notification"> </div>
-//     <div class="weather-container">
-//         <div class="weather-icon">
-//             <img src="icons/unknown.png" alt="">
-//         </div>
-//         <div class="temperature-value">
-//             <p>- °<span>C</span></p>
-//         </div>
-//         <div class="temperature-description">
-//             <p> - </p>
-//         </div>
-//         <div class="location">
-//             <p>-</p>
-//         </div>
-//     </div>
-// </div> -->
+const renderCard = (city, notification, iconUrl, temperature, description) => {
 
     const card = document.createElement("div");
     card.className = "container";
@@ -67,52 +35,49 @@ const renderCard = (city, notification, temperature, iconUrl, description, locat
     const divCity = document.createElement("div");
     divCity.className = "city";
     card.appendChild(divCity);
-
     const pCity = document.createElement("p");
-    pCity.className = "city p";
     divCity.appendChild(pCity);
+    pCity.innerHTML = city;
 
-
-    const notificationEl = document.createElement("p");
-    notificationEl.className = "notification";
-    card.appendChild(notificationEl);
-
-    const iconEl = document.createElement("img");
-    iconEl.className = "weather-icon";
-    card.appendChild(iconEl);
-
-    const tempEl = document.createElement("p");
-    tempEl.className = "temperature-value";
-    card.appendChild(tempEl);
-
-    const descriptionEl = document.createElement("p");
-    descriptionEl.className = "temperature-description";
-    card.appendChild(descriptionEl);
-
-    const locationEl = document.createElement("p");
-    locationEl.className = "location";
-    card.appendChild(locationEl);
-
-    //Adding the information to the card 
-    if (error === true) {
-        pCity.innerHTML = "-";
-        notificationEl.innerHTML = "Hay un problema";
-        iconEl.src = "img/icons/unknown.png";
-        tempEl.innerHTML = `- ºC`;
-        descriptionEl.innerHTML = "-";
-        locationEl.innerHTML = "-";
-    } else {
-        pCity.innerHTML = city;
-        notificationEl.innerHTML = notification;
-        iconEl.src = iconUrl;
-        tempEl.innerHTML = temperature;
-        descriptionEl.innerHTML = description;
-        locationEl.innerHTML = location;
+    if (notification != "") {
+        const divNotification = document.createElement("div");
+        divNotification.className = "notification";
+        divNotification.style.display = "block";
+        card.appendChild(divNotification);
+        const pNotification = document.createElement("p");
+        divNotification.appendChild(pNotification);
+        pNotification.innerHTML = notification;
     }
+
+    const divWeather = document.createElement("div");
+    divWeather.className = "weather-container";
+    card.appendChild(divWeather);
+
+    const divIcon = document.createElement("div");
+    divIcon.className = "weather-icon";
+    divWeather.appendChild(divIcon);
+    const imgIcon = document.createElement("img");
+    divIcon.appendChild(imgIcon);
+    imgIcon.src = iconUrl;
+
+    const divTemp = document.createElement("div");
+    divTemp.className = "temperature-value";
+    divWeather.appendChild(divTemp);
+    const pTemp = document.createElement("p");
+    divTemp.appendChild(pTemp);
+    pTemp.innerHTML = temperature;
+
+    const divDescription = document.createElement("div");
+    divDescription.className = "temperature-description";
+    divWeather.appendChild(divDescription);
+    const pDescription = document.createElement("p");
+    divDescription.appendChild(pDescription);
+    pDescription.innerHTML = description;
 }
 
 function handleErrors(response) {
     if (!response.ok) {
+        renderCard("-", "Hay un problema", "icons/unknown.png", `- ºC`, "-");
         throw new Error(`Encountered something unexpected: ${response.status} ${response.statusText}`);
     }
     return response;
@@ -123,11 +88,8 @@ const getWeather = (latitude, longitude) => {
     fetch(URL)
         .then(handleErrors)
         .then(response => response.json())
-        .then(render)
+        .then(parseAndRender)
         .catch((error) => { console.log(error) })
 }
 
-
-// cities.forEach((city) => getWeather(city.latitude, city.longitude));
-
-getWeather(41.390205, 2.154007);
+cities.forEach((item) => getWeather(item.latitude, item.longitude));
