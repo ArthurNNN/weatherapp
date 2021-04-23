@@ -4,9 +4,6 @@
 const API_KEY = '63727bfa5b324cce98dfb8d2c9fd3f38'
 const urlBase = 'https://api.weatherbit.io/v2.0/current?'
 
-// var latitude = 41.3868;
-// var longitude = 2.1803;
-
 const cities = [];
 cities.push({
     name: "Barcelona",
@@ -24,72 +21,94 @@ cities.push({
     longitude: -0.38
 });
 
-
-
-// const getUserPosition = () => {
-//     navigator.geolocation.getCurrentPosition((location) => {
-//         console.log(location);
-//         const { coords: { latitude, longitude } } = location;
-//         getForecast(latitude, longitude);
-//     }, (error) => console.error(error), { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 });
-// }
-
 const render = (responseJson) => {
 
-    let weather = responseJson.data[0];
+    let weatherObj = responseJson.data[0];
     console.log('Success: ');
-    console.log(weather);
+    console.log(weatherObj);
 
-    //     <div class="container">
-    //     <div class="app-title">
-    //         <p>Weather</p>
-    //     </div>
-    //     <div class="notification"> </div>
-    //     <div class="weather-container">
-    //         <div class="weather-icon">
-    //             <img src="icons/unknown.png" alt="">
-    //         </div>
-    //         <div class="temperature-value">
-    //             <p>- °<span>C</span></p>
-    //         </div>
-    //         <div class="temperature-description">
-    //             <p> - </p>
-    //         </div>
-    //         <div class="location">
-    //             <p>-</p>
-    //         </div>
-    //     </div>
-    // </div>
+    let city = weatherObj.city_name;
+    let temperature = weatherObj.temp + '°C';
+    let iconUrl = 'https://www.weatherbit.io/static/img/icons/' + weatherObj.weather.icon + '.png';
+    let description = weatherObj.weather.description;
+    let location = '[' + weatherObj.city_name + ', ' + weatherObj.country_code + ']';
+    let notification = "";
+    error = false;
+    renderCard(city, notification, temperature, iconUrl, description, location, error);
+}
 
-    // let div = document.createElement('div.container')
+const renderCard = (city, notification, temperature, iconUrl, description, location, error) => {
 
-    // let div = document.createElement('div');
-    // div.className = 'container';
-    // let text = document.createTextNode('Test');
-    // div.appendChild(text);
-    // document.body.appendChild(div)
-    // let divContainer = document.querySelector('body:last-child').createElement('div.container')
+//     <!-- <div class="card">
+//     <div class="city">
+//         <p>City</p>
+//     </div>
+//     <div class="notification"> </div>
+//     <div class="weather-container">
+//         <div class="weather-icon">
+//             <img src="icons/unknown.png" alt="">
+//         </div>
+//         <div class="temperature-value">
+//             <p>- °<span>C</span></p>
+//         </div>
+//         <div class="temperature-description">
+//             <p> - </p>
+//         </div>
+//         <div class="location">
+//             <p>-</p>
+//         </div>
+//     </div>
+// </div> -->
 
-    let pCity = document.querySelector('div.app-title p');
-    pCity.textContent = weather.city_name;
+    const card = document.createElement("div");
+    card.className = "container";
+    document.querySelector("#cards").appendChild(card);
 
-    let img = document.querySelector("div.weather-icon img");
-    let iconUrl = 'https://www.weatherbit.io/static/img/icons/' + weather.weather.icon + '.png';
-    img.src = iconUrl;
+    const divCity = document.createElement("div");
+    divCity.className = "city";
+    card.appendChild(divCity);
 
-    let ptemperature = document.querySelector('div.temperature-value p');
-    ptemperature.textContent = weather.temp;
+    const pCity = document.createElement("p");
+    pCity.className = "city p";
+    divCity.appendChild(pCity);
 
-    let pDescription = document.querySelector('div.temperature-description p');
-    pDescription.textContent = weather.weather.description;
 
-    let pLocation = document.querySelector('div.location p');
-    pLocation.textContent = '[' + weather.city_name + ', ' + weather.country_code + ']';
+    const notificationEl = document.createElement("p");
+    notificationEl.className = "notification";
+    card.appendChild(notificationEl);
 
-    let div = document.createElement('div');
-    // div.className = 'container';
+    const iconEl = document.createElement("img");
+    iconEl.className = "weather-icon";
+    card.appendChild(iconEl);
 
-    duplicateChildNodes('body');
+    const tempEl = document.createElement("p");
+    tempEl.className = "temperature-value";
+    card.appendChild(tempEl);
+
+    const descriptionEl = document.createElement("p");
+    descriptionEl.className = "temperature-description";
+    card.appendChild(descriptionEl);
+
+    const locationEl = document.createElement("p");
+    locationEl.className = "location";
+    card.appendChild(locationEl);
+
+    //Adding the information to the card 
+    if (error === true) {
+        pCity.innerHTML = "-";
+        notificationEl.innerHTML = "Hay un problema";
+        iconEl.src = "img/icons/unknown.png";
+        tempEl.innerHTML = `- ºC`;
+        descriptionEl.innerHTML = "-";
+        locationEl.innerHTML = "-";
+    } else {
+        pCity.innerHTML = city;
+        notificationEl.innerHTML = notification;
+        iconEl.src = iconUrl;
+        tempEl.innerHTML = temperature;
+        descriptionEl.innerHTML = description;
+        locationEl.innerHTML = location;
+    }
 }
 
 function handleErrors(response) {
@@ -108,18 +127,7 @@ const getWeather = (latitude, longitude) => {
         .catch((error) => { console.log(error) })
 }
 
-function duplicateChildNodes(parentId) {
-    var parent = document.querySelector(parentId);
-    NodeList.prototype.forEach = Array.prototype.forEach;
-    var children = parent.childNodes;
-    children.forEach(function (item) {
-        var cln = item.cloneNode(true);
-        parent.appendChild(cln);
-    });
-};
 
-// duplicateChildNodes("container");
+// cities.forEach((city) => getWeather(city.latitude, city.longitude));
 
-// getUserPosition();
-
-cities.forEach((city) => getWeather(city.latitude, city.longitude));
+getWeather(41.390205, 2.154007);
