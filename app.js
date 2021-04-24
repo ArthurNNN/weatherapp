@@ -1,6 +1,10 @@
-const API_KEY = '63727bfa5b324cce98dfb8d2c9fd3f38'
-const urlBase = 'https://api.weatherbit.io/v2.0/current?'
+// const API_KEY = '63727bfa5b324cce98dfb8d2c9fd3f38'
+const WEATHER_API_KEY = 'af4640f0ab044f5daf55fa0a59ec55b0';
+const WEATHER_BASE_URL = 'https://api.weatherbit.io/v2.0/current?';
+const MAP_API_KEY = `pk.eyJ1IjoiYXJ0aHVybm5uIiwiYSI6ImNrbnZ2YXQ1YTA2OWMyb252cTgwZWl6cncifQ.XgVq_N09PL3CyiI4K30lMg`;
 
+
+var citiesWeatherArray = [];
 const cities = [
     { name: "Barcelona", latitude: 41.390205, longitude: 2.154007 },
     { name: "Moscow", latitude: 55.75583, longitude: 37.61778, },
@@ -23,7 +27,11 @@ const parseAndRender = (responseJson) => {
     let iconUrl = `https://www.weatherbit.io/static/img/icons/${weatherObj.weather.icon}.png`;
     let description = weatherObj.weather.description;
 
-    renderCard(city, notification, iconUrl, temperature, description);
+    var cityWeather = [city, notification, iconUrl, temperature, description];
+    console.log(cityWeather);
+    citiesWeatherArray.push(cityWeather);
+
+    renderCard(cityWeather[0], cityWeather[1], cityWeather[2], cityWeather[3], cityWeather[4]);
 }
 
 const renderCard = (city, notification, iconUrl, temperature, description) => {
@@ -38,6 +46,7 @@ const renderCard = (city, notification, iconUrl, temperature, description) => {
     const pCity = document.createElement("p");
     divCity.appendChild(pCity);
     pCity.innerHTML = city;
+    // console.log(`Render ${city} from array`);
 
     if (notification != "") {
         const divNotification = document.createElement("div");
@@ -84,7 +93,7 @@ function handleErrors(response) {
 }
 
 const getWeather = (latitude, longitude) => {
-    const URL = `${urlBase}&lat=${latitude}&lon=${longitude}&key=${API_KEY}`;
+    const URL = `${WEATHER_BASE_URL}&lat=${latitude}&lon=${longitude}&key=${WEATHER_API_KEY}`;
     fetch(URL)
         .then(handleErrors)
         .then(response => response.json())
@@ -92,21 +101,22 @@ const getWeather = (latitude, longitude) => {
         .catch((error) => { console.log(error) })
 }
 
-const filterCities = () => {
+const filterCards = () => {
 
-    
     var divCards = document.querySelector("#cards");
-    // clear list of repos
-    while (divCards.firstChild) {
-        divCards.removeChild(divCards.firstChild);
-    }
-
-    const searchString = document.querySelector("input").value.toLowerCase();
-    const filteredCities = cities.filter(item => item.name.toLowerCase().includes(searchString));
-
-    filteredCities.forEach((item) => getWeather(item.latitude, item.longitude))
+    var searchString = document.querySelector("input");
+    setInterval(() => {
+        input.addEventListener("keyup", event => {
+            const searchString = event.target.value.toLowerCase();
+            // clear list of cards
+            while (divCards.firstChild) {
+                divCards.removeChild(divCards.firstChild);
+            }
+            citiesWeatherArray.filter(item => item[0].toLowerCase().includes(searchString))
+                .forEach((item) => renderCard(item[0], item[1], item[2], item[3], item[4]));
+        });
+    }, 2000);
 }
 
 cities.forEach((item) => getWeather(item.latitude, item.longitude))
-var searchBtn = document.querySelector("#searchBtn");
-searchBtn.addEventListener("click", filterCities);
+filterCards();

@@ -6,19 +6,36 @@
     <title>Weather App - JavaScript</title>
     <link rel="stylesheet" href="font/Rimouski.css">
     <link rel="stylesheet" href="style.css">
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css' rel='stylesheet' />
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js'></script>
 </head>
 
 <body>
 
+
     <div id="search" class="search">
-        <input  type="text" placeholder="search" >
-        <button id="searchBtn" type="submit" >Search</button>
+        <h1>Current Weather</h1>
+        <!-- <h3>Search by City Name in the cities below</h3> -->
+        <input id="input" type="text" placeholder="search">
     </div>
+    <div id="map">
+        <div id='map' style='width: 400px; height: 400px;'></div>
+        <script>
+            mapboxgl.accessToken =
+                'pk.eyJ1IjoiYXJ0aHVybm5uIiwiYSI6ImNrbnZ2YXQ1YTA2OWMyb252cTgwZWl6cncifQ.XgVq_N09PL3CyiI4K30lMg';
+            var map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/streets-v11'
+            });
+        </script>
+    </div>
+
     <div id="cards">
 
     </div>
 
     <script src="app.js"></script>
+
 </body>
 
 </html>
