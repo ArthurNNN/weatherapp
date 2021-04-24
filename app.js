@@ -92,4 +92,21 @@ const getWeather = (latitude, longitude) => {
         .catch((error) => { console.log(error) })
 }
 
-cities.forEach((item) => getWeather(item.latitude, item.longitude));
+const filterCities = () => {
+
+    
+    var divCards = document.querySelector("#cards");
+    // clear list of repos
+    while (divCards.firstChild) {
+        divCards.removeChild(divCards.firstChild);
+    }
+
+    const searchString = document.querySelector("input").value.toLowerCase();
+    const filteredCities = cities.filter(item => item.name.toLowerCase().includes(searchString));
+
+    filteredCities.forEach((item) => getWeather(item.latitude, item.longitude))
+}
+
+cities.forEach((item) => getWeather(item.latitude, item.longitude))
+var searchBtn = document.querySelector("#searchBtn");
+searchBtn.addEventListener("click", filterCities);
