@@ -17,10 +17,10 @@ const parseAndRender = (responseJson) => {
     console.log('Success: ');
     console.log(weatherObj);
 
-    let city = weatherObj.city_name + ', ' + weatherObj.country_code;
+    let city = `${weatherObj.city_name}, ${weatherObj.country_code}`;
     let notification = "";
-    let temperature = weatherObj.temp + '°C';
-    let iconUrl = 'https://www.weatherbit.io/static/img/icons/' + weatherObj.weather.icon + '.png';
+    let temperature = `${weatherObj.temp}°C`;
+    let iconUrl = `https://www.weatherbit.io/static/img/icons/${weatherObj.weather.icon}.png`;
     let description = weatherObj.weather.description;
 
     renderCard(city, notification, iconUrl, temperature, description);
